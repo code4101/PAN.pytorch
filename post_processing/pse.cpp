@@ -29,8 +29,8 @@ namespace pan{
         auto pbuf_label_map = label_map.request();
         if (pbuf_label_map.ndim != 2 || pbuf_label_map.shape[0]==0 || pbuf_label_map.shape[1]==0)
             throw std::runtime_error("label map must have a shape of (h>0, w>0)");
-        int h = pbuf_label_map.shape[0];
-        int w = pbuf_label_map.shape[1];
+        const int h = pbuf_label_map.shape[0];
+        const int w = pbuf_label_map.shape[1];
         if (pbuf_similarity_vectors.ndim != 3 || pbuf_similarity_vectors.shape[0]!=h || pbuf_similarity_vectors.shape[1]!=w || pbuf_similarity_vectors.shape[2]!=4 ||
             pbuf_text.shape[0]!=h || pbuf_text.shape[1]!=w)
             throw std::runtime_error("similarity_vectors must have a shape of (h,w,4) and text must have a shape of (h,w,4)");
@@ -79,6 +79,7 @@ namespace pan{
 
         int dx[4] = {-1, 1, 0, 0};
         int dy[4] = {0, 0, -1, 1};
+        bool tmp_map[w*h] = {0};
         while(!q.empty()){
             //get each queue menber in q
             auto q_n = q.front();
@@ -92,6 +93,8 @@ namespace pan{
             {
                 int tmpy = y + dy[idx];
                 int tmpx = x + dx[idx];
+                if (tmp_map[tmpy*w+tmpx]) continue;
+                tmp_map[tmpy*w+tmpx] = true;
                 auto p_res = ptr_res + tmpy*w;
                 if (tmpy<0 || tmpy>=h || tmpx<0 || tmpx>=w)
                     continue;
